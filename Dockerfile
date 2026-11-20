@@ -78,8 +78,13 @@ COPY . .
 COPY --from=composer-deps /var/www/html/vendor/ ./vendor/
 COPY --from=composer-deps /var/www/html/bootstrap/cache/ ./bootstrap/cache/
 COPY --from=frontend-build /app/public/build/ ./public/build/
+COPY docker/certs/ /tmp/aiven-certs/
 
-RUN mkdir -p \
+RUN if [ -f /tmp/aiven-certs/ca.pem ]; then \
+        install -o root -g root -m 0644 /tmp/aiven-certs/ca.pem /etc/ssl/certs/aiven-ca.pem; \
+    fi \
+    && rm -rf /tmp/aiven-certs \
+    && mkdir -p \
         storage/app/private \
         storage/app/public \
         storage/framework/cache/data \
